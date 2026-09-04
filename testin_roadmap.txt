@@ -1,0 +1,27 @@
+Your Playwright learning roadmap
+Step	What to learn	Why
+✅ 1	Playwright basics	Browser, Page, Locator
+✅ 2	Codegen	Generate locators/actions
+✅ 3	Locators	locator(), getByRole(), getByText()
+✅ 4	Waits	waitFor(), waitForURL(), auto-waiting
+✅ 5	TestNG	@Test, @BeforeMethod, @AfterMethod
+✅ 6	POM	LoginPage, PatientPage, LogoutPage
+🔄 7	Excel test data	Run tests for many patient IDs
+8	Assertions	Properly verify UI/API results
+9	Handling multiple tabs/windows	You already started this with waitForPopup()
+10	Dropdowns	Select and verify dropdown values
+11	Checkboxes/radio buttons	Forms and filters
+12	Tables	Find rows, columns, pagination
+13	Frames/iframes	Interact with embedded applications
+14	Alerts/dialogs	JavaScript alerts, confirms, prompts
+15	File upload/download	Upload documents and verify downloads
+16	Screenshots	Capture failures and important steps
+17	Video recording	Record failed/important tests
+18	Parameterization	Run same test with many datasets
+19	Data-driven testing	Excel + TestNG DataProvider
+20	Configuration	URLs, usernames, passwords, environments
+21	Logging/reporting	Allure/Extent-style reports
+22	Failure handling	Retry, screenshots, tracing
+23	Parallel execution	Run many tests simultaneously
+24	API testing with Playwright	  
+
