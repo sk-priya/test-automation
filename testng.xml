@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="DME Playwright Suite">
+    <test name="DME Automation Tests">
+        <classes>
+            <class name="com.dme.automation.tests.LoginTest"/>
+            <class name="com.dme.automation.tests.LogoutTest"/>
+        </classes>
+    </test>
+</suite>
