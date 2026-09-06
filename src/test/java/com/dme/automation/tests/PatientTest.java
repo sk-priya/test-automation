@@ -4,50 +4,117 @@ import com.dme.automation.base.BaseTest;
 import com.dme.automation.pages.LoginPage;
 import com.dme.automation.pages.LogoutPage;
 import com.dme.automation.pages.PatientPage;
+import com.dme.automation.utils.ExcelReader;
+
 import com.microsoft.playwright.Page;
+
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 public class PatientTest extends BaseTest {
 
     private static final String BASE_URL =
-            "https://ui-dev.dmeez.in/";
+        "https://ui-dev.dmeez.in/";
 
-    private static final String PATIENT_ID =
-            "PTN1000001238";
+    private static final String EXCEL_PATH =
+        "test-data/patients.xlsx";
+
+    private static final String SHEET_NAME =
+        "Patients";
 
 
-    @Test
-    public void testPatientFlow() {
+    // =====================================================
+    // DataProvider
+    // =====================================================
 
-        // =====================================================
+    @DataProvider(name = "patientData")
+    public Object[][] patientData() {
+
+        ExcelReader excelReader =
+            new ExcelReader(EXCEL_PATH);
+
+        List<String> patientIds =
+            excelReader.getPatientIds(
+                SHEET_NAME
+            );
+
+        Object[][] data =
+            new Object[patientIds.size()][1];
+
+        for (int i = 0;
+             i < patientIds.size();
+             i++) {
+
+            data[i][0] =
+                patientIds.get(i);
+        }
+
+        return data;
+    }
+
+
+    // =====================================================
+    // Patient Test
+    // =====================================================
+
+    @Test(dataProvider = "patientData")
+    public void testPatientFlow(
+        String patientId
+    ) {
+
+        System.out.println(
+            "========================================"
+        );
+
+        System.out.println(
+            "Starting Patient Test: "
+            + patientId
+        );
+
+        System.out.println(
+            "========================================"
+        );
+
+
+        // =================================================
         // Get Login Credentials
-        // =====================================================
+        // =================================================
 
-        String username = System.getenv("DME_USERNAME");
-        String password = System.getenv("DME_PASSWORD");
+        String username =
+            System.getenv("DME_USERNAME");
 
-        if (username == null || username.isBlank()
-                || password == null || password.isBlank()) {
+        String password =
+            System.getenv("DME_PASSWORD");
+
+        if (username == null
+                || username.isBlank()
+                || password == null
+                || password.isBlank()) {
 
             throw new IllegalStateException(
-                "Set DME_USERNAME and DME_PASSWORD environment variables."
+                "Set DME_USERNAME and DME_PASSWORD "
+                + "environment variables."
             );
         }
 
 
-        // =====================================================
+        // =================================================
         // Step 1: Login
-        // =====================================================
+        // =================================================
 
         System.out.println(
             "Opening application..."
         );
 
         LoginPage loginPage =
-                new LoginPage(page);
+            new LoginPage(page);
 
-        loginPage.openApplication(BASE_URL);
+        loginPage.openApplication(
+            BASE_URL
+        );
 
         loginPage.login(
             username,
@@ -60,22 +127,18 @@ public class PatientTest extends BaseTest {
             "LOGIN SUCCESS"
         );
 
-        System.out.println(
-            "Current URL: " + page.url()
-        );
 
-
-        // =====================================================
+        // =================================================
         // Create Patient Page
-        // =====================================================
+        // =================================================
 
         PatientPage patientPage =
-                new PatientPage(page);
+            new PatientPage(page);
 
 
-        // =====================================================
+        // =================================================
         // Step 2: Open Sidebar
-        // =====================================================
+        // =================================================
 
         System.out.println(
             "Opening sidebar..."
@@ -86,9 +149,9 @@ public class PatientTest extends BaseTest {
         page.waitForTimeout(1000);
 
 
-        // =====================================================
-        // Step 3: Open Patient
-        // =====================================================
+        // =================================================
+        // Step 3: Open Patient Menu
+        // =================================================
 
         System.out.println(
             "Opening Patient..."
@@ -99,9 +162,9 @@ public class PatientTest extends BaseTest {
         page.waitForTimeout(1000);
 
 
-        // =====================================================
+        // =================================================
         // Step 4: Open Patients
-        // =====================================================
+        // =================================================
 
         System.out.println(
             "Opening Patients..."
@@ -113,30 +176,29 @@ public class PatientTest extends BaseTest {
             "**/patientsearch"
         );
 
+        Assert.assertTrue(
+            page.url().contains(
+                "/patientsearch"
+            ),
+            "Patients Search page was not opened"
+        );
+
         System.out.println(
             "PATIENT SEARCH PAGE OPENED"
         );
 
-        System.out.println(
-            "Current URL: " + page.url()
-        );
 
-        Assert.assertTrue(
-            page.url().contains("/patientsearch"),
-            "Patients Search page was not opened"
-        );
-
-
-        // =====================================================
-        // Step 5: Enter Patient ID + Search
-        // =====================================================
+        // =================================================
+        // Step 5: Search Patient
+        // =================================================
 
         System.out.println(
-            "Entering Patient ID: " + PATIENT_ID
+            "Searching Patient ID: "
+            + patientId
         );
 
         patientPage.searchPatient(
-            PATIENT_ID
+            patientId
         );
 
         System.out.println(
@@ -144,23 +206,24 @@ public class PatientTest extends BaseTest {
         );
 
 
-        // =====================================================
+        // =================================================
         // Step 6: Open Patient Details
-        // =====================================================
+        // =================================================
 
         System.out.println(
-            "Clicking Patient ID: " + PATIENT_ID
+            "Opening Patient Details: "
+            + patientId
         );
 
         Page patientDetailsPage =
-                patientPage.openPatient(
-                    PATIENT_ID
-                );
+            patientPage.openPatient(
+                patientId
+            );
 
 
-        // =====================================================
+        // =================================================
         // Step 7: Verify Patient Details
-        // =====================================================
+        // =================================================
 
         System.out.println(
             "PATIENT DETAILS PAGE OPENED"
@@ -172,49 +235,56 @@ public class PatientTest extends BaseTest {
         );
 
         Assert.assertTrue(
-            patientDetailsPage.url().contains(
-                "/patientdetails/"
-            ),
+            patientDetailsPage.url()
+                .contains("/patientdetails/"),
             "Patient Details page was not opened"
         );
 
-        // Wait 10 seconds so you can see the Patient Details page
-        System.out.println("Waiting 10 seconds before logout...");
-        patientDetailsPage.waitForTimeout(10000);
+
+        // =================================================
+        // Wait 10 seconds
+        // =================================================
+
+        System.out.println(
+            "Waiting 10 seconds before logout..."
+        );
+
+        patientDetailsPage.waitForTimeout(
+            10000
+        );
 
 
-        // =====================================================
+        // =================================================
         // Step 8: Logout
-        // =====================================================
+        // =================================================
 
         System.out.println(
             "Starting logout..."
         );
 
-        /*
-         * IMPORTANT:
-         *
-         * Logout is performed on the NEW Patient Details tab,
-         * not on the original Patients Search page.
-         */
         LogoutPage logoutPage =
-                new LogoutPage(
-                    patientDetailsPage
-                );
+            new LogoutPage(
+                patientDetailsPage
+            );
 
         logoutPage.performLogout();
 
 
-        // =====================================================
-        // Logout Successful
-        // =====================================================
+        // =================================================
+        // Test Complete
+        // =================================================
 
         System.out.println(
             "LOGOUT SUCCESS"
         );
 
-        // Keep the browser open briefly so you can see
-        // the final state.
-        patientDetailsPage.waitForTimeout(5000);
+        System.out.println(
+            "Patient test completed: "
+            + patientId
+        );
+
+        patientDetailsPage.waitForTimeout(
+            5000
+        );
     }
 }
