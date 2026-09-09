@@ -5,18 +5,19 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-
 public class SalesOrderLogoutPage extends BasePage {
 
     private final Locator userProfileName;
     private final Locator logoutButton;
 
     public SalesOrderLogoutPage(Page page) {
+
         super(page);
 
-        // Specifically target the profile LINK
-        // This avoids the "sagar jena" option inside assignedToId
+        // =====================================================
+        // Profile link
+        // =====================================================
+
         this.userProfileName =
                 page.getByRole(
                         AriaRole.LINK,
@@ -25,7 +26,11 @@ public class SalesOrderLogoutPage extends BasePage {
                                 .setExact(true)
                 );
 
+
+        // =====================================================
         // Sign Out button
+        // =====================================================
+
         this.logoutButton =
                 page.getByRole(
                         AriaRole.BUTTON,
@@ -34,46 +39,96 @@ public class SalesOrderLogoutPage extends BasePage {
                 );
     }
 
+
+    // =========================================================
+    // Verify Username
+    // =========================================================
+
     public void verifyUsername(
             String expectedDisplayName) {
 
         userProfileName.waitFor();
 
-        assertThat(userProfileName)
-                .hasText(expectedDisplayName);
+        String actualDisplayName =
+                userProfileName.innerText().trim();
+
+        if (!actualDisplayName.equals(
+                expectedDisplayName)) {
+
+            throw new AssertionError(
+                    "Expected profile name: "
+                            + expectedDisplayName
+                            + " but found: "
+                            + actualDisplayName
+            );
+        }
+
+        System.out.println(
+                "Profile verified: "
+                        + actualDisplayName
+        );
     }
+
+
+    // =========================================================
+    // Click User Profile
+    // =========================================================
 
     public void clickUserProfile() {
 
         userProfileName.waitFor();
 
         userProfileName.click();
+
+        System.out.println(
+                "User profile clicked"
+        );
     }
+
+
+    // =========================================================
+    // Click Logout
+    // =========================================================
 
     public void clickLogout() {
 
-        logoutButton.waitFor();
+        logoutButton.waitFor(
+                new Locator.WaitForOptions()
+                        .setTimeout(15000)
+        );
 
         logoutButton.click();
+
+        System.out.println(
+                "Sign Out clicked"
+        );
     }
+
+
+    // =========================================================
+    // Complete Logout
+    // =========================================================
 
     public void performLogout() {
 
         String expectedDisplayName =
-                System.getenv("DME_DISPLAY_NAME");
+                System.getenv(
+                        "DME_DISPLAY_NAME"
+                );
 
         if (expectedDisplayName == null
                 || expectedDisplayName.isBlank()) {
 
-            expectedDisplayName = "sagar jena";
+            expectedDisplayName =
+                    "sagar jena";
         }
 
-        verifyUsername(expectedDisplayName);
 
-        System.out.println(
-                "Profile verified: "
-                        + expectedDisplayName
+        verifyUsername(
+                expectedDisplayName
         );
+
+        page.waitForTimeout(1000);
 
         clickUserProfile();
 
@@ -81,13 +136,18 @@ public class SalesOrderLogoutPage extends BasePage {
 
         clickLogout();
 
+
+        // =====================================================
+        // Verify that login page appeared
+        // =====================================================
+
         page.locator("#username").waitFor(
                 new Locator.WaitForOptions()
                         .setTimeout(10000)
         );
 
         System.out.println(
-                "Sales Order logout completed successfully"
+                "Logout completed successfully"
         );
     }
 }

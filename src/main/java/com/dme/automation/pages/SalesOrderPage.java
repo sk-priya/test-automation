@@ -11,9 +11,9 @@ public class SalesOrderPage extends BasePage {
         super(page);
     }
 
-    // =========================================
-    // Open Ordering menu
-    // =========================================
+    // =========================================================
+    // Open Ordering
+    // =========================================================
 
     public void openOrdering() {
 
@@ -28,9 +28,10 @@ public class SalesOrderPage extends BasePage {
         orderingMenu.click();
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Sales Orders
-    // =========================================
+    // =========================================================
 
     public void openSalesOrders() {
 
@@ -45,9 +46,10 @@ public class SalesOrderPage extends BasePage {
         salesOrders.click();
     }
 
-    // =========================================
+
+    // =========================================================
     // Search Sales Order
-    // =========================================
+    // =========================================================
 
     public void searchSalesOrder(
             String salesOrderNumber,
@@ -61,11 +63,28 @@ public class SalesOrderPage extends BasePage {
                 );
 
         salesOrderField.waitFor();
-        salesOrderField.fill(salesOrderNumber);
 
+        salesOrderField.fill(
+                salesOrderNumber
+        );
+
+        System.out.println(
+                "Sales Order entered: "
+                        + salesOrderNumber
+        );
+
+
+        // Status is hardcoded in the test.
         page.locator(
                 "select[name=\"salesOrderStatus\"]"
         ).selectOption(status);
+
+
+        System.out.println(
+                "Status selected: "
+                        + status
+        );
+
 
         Locator searchButton =
                 page.getByRole(
@@ -76,34 +95,96 @@ public class SalesOrderPage extends BasePage {
 
         searchButton.waitFor();
         searchButton.click();
+
+        System.out.println(
+                "Sales Order searched: "
+                        + salesOrderNumber
+        );
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Sales Order Details
-    // =========================================
+    // =========================================================
 
     public Page openSalesOrder(
             String salesOrderNumber) {
 
+        System.out.println(
+                "Looking for Sales Order result: "
+                        + salesOrderNumber
+        );
+
+        // Give the result page a little time to update.
+        page.waitForTimeout(3000);
+
+
+        // =====================================================
+        // Debug: Current URL
+        // =====================================================
+
+        System.out.println(
+                "Current URL: "
+                        + page.url()
+        );
+
+
+        // =====================================================
+        // Debug: Find links containing Sales Order ID
+        // =====================================================
+
+        Locator linksContainingSalesOrder =
+                page.locator(
+                        "a:has-text('" +
+                                salesOrderNumber +
+                                "')"
+                );
+
+        System.out.println(
+                "Links containing Sales Order ID: "
+                        + linksContainingSalesOrder.count()
+        );
+
+
+        // =====================================================
+        // Debug: Exact role link
+        // =====================================================
+
+        Locator salesOrderLink =
+                page.getByRole(
+                        AriaRole.LINK,
+                        new Page.GetByRoleOptions()
+                                .setName(salesOrderNumber)
+                                .setExact(true)
+                );
+
+        System.out.println(
+                "Exact role link count: "
+                        + salesOrderLink.count()
+        );
+
+
+        // =====================================================
+        // Open Details in new tab
+        // =====================================================
+
         return page.waitForPopup(() -> {
 
-            Locator salesOrderLink =
-                    page.getByRole(
-                            AriaRole.LINK,
-                            new Page.GetByRoleOptions()
-                                    .setName(salesOrderNumber)
-                                    .setExact(true)
-                    );
-
             salesOrderLink.waitFor();
+
+            System.out.println(
+                    "Sales Order link found: "
+                            + salesOrderNumber
+            );
 
             salesOrderLink.click();
         });
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Clinical
-    // =========================================
+    // =========================================================
 
     public void openClinical() {
 
@@ -113,11 +194,16 @@ public class SalesOrderPage extends BasePage {
                         .setName("Clinical")
                         .setExact(true)
         ).click();
+
+        System.out.println(
+                "Clinical opened"
+        );
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Insurance
-    // =========================================
+    // =========================================================
 
     public void openInsurance() {
 
@@ -127,11 +213,16 @@ public class SalesOrderPage extends BasePage {
                         .setName("Insurance")
                         .setExact(true)
         ).click();
+
+        System.out.println(
+                "Insurance opened"
+        );
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Item
-    // =========================================
+    // =========================================================
 
     public void openItem() {
 
@@ -141,22 +232,34 @@ public class SalesOrderPage extends BasePage {
                         .setName("Item")
                         .setExact(true)
         ).click();
+
+        System.out.println(
+                "Item opened"
+        );
     }
 
-    // =========================================
-    // Select WIP Status
-    // =========================================
 
-    public void selectWipStatus(String statusId) {
+    // =========================================================
+    // Select WIP Status
+    // =========================================================
+
+    public void selectWipStatus(
+            String statusId) {
 
         page.locator(
                 "select[name=\"wipStatusId\"]"
         ).selectOption(statusId);
+
+        System.out.println(
+                "WIP Status selected: "
+                        + statusId
+        );
     }
 
-    // =========================================
+
+    // =========================================================
     // Select Procedure Code
-    // =========================================
+    // =========================================================
 
     public void selectProcedureCode(
             String procedureCode) {
@@ -164,11 +267,17 @@ public class SalesOrderPage extends BasePage {
         page.locator(
                 "select[name=\"proccode\"]"
         ).selectOption(procedureCode);
+
+        System.out.println(
+                "Procedure Code selected: "
+                        + procedureCode
+        );
     }
 
-    // =========================================
+
+    // =========================================================
     // Open Documents
-    // =========================================
+    // =========================================================
 
     public void openDocuments() {
 
@@ -178,5 +287,9 @@ public class SalesOrderPage extends BasePage {
                         .setName("Documents")
                         .setExact(true)
         ).click();
+
+        System.out.println(
+                "Documents opened"
+        );
     }
 }
